@@ -113,6 +113,7 @@ public final class ZMUserSession: NSObject {
 
     let analyiticsLogger: WireLogger
     let journal: Journal
+    let appVersionMigrationService: AppVersionMigrationService
 
     // MARK: Computed Properties
 
@@ -463,6 +464,12 @@ public final class ZMUserSession: NSObject {
             coreCryptoProvider: coreCryptoProvider
         )
         self.journal = journal
+        self.appVersionMigrationService = AppVersionMigrationService(
+            journal: journal,
+            currentVersion: SemanticVersion(stringLiteral: appVersion),
+            allMigrations: [MigrateTo4_0_1()]
+        )
+
         super.init()
     }
 
@@ -607,7 +614,7 @@ public final class ZMUserSession: NSObject {
         }
     }
 
-    public func migrateToConsumableNotificationsIfNeeded() async {
+    public func migrateToConsumableNotificationsIfNeeded() async {//
         guard !journal[.isConsumableNotificationsEnabled] else { return }
         guard let migrator = clientSessionComponent?.consumableNotificationsMigrator() else {
             WireLogger.sync.warn("No consumable-notifications migrator available")
@@ -619,6 +626,14 @@ public final class ZMUserSession: NSObject {
             // ignore error
         } catch {
             WireLogger.session.error("Failed to migrate to consumable-notifications: \(String(describing: error))")
+        }
+    }
+
+    public func migrateAPIVersionIfNeeded() async {
+        do {
+            try await appVersionMigrationService.performAppMigrations()
+        } catch {
+            // log error
         }
     }
 
@@ -1576,6 +1591,15 @@ extension ZMUserSession {
 
             callCenter.processCallEvent(callEvent)
         }
+
+    }
+}
+
+
+struct MigrateTo4_0_1: AppVersionMigration {
+    var version: SemanticVersion { SemanticVersion("4.0.1") }
+
+    func perform() async throws {
 
     }
 }

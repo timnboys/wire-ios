@@ -1099,6 +1099,7 @@ public final class SessionManager: NSObject, SessionManagerType {
                         journal: journal
                     )
 
+                    await userSession.migrateAPIVersionIfNeeded()
                     await userSession.migrateToConsumableNotificationsIfNeeded()
 
                     await userSession.triggerSync()

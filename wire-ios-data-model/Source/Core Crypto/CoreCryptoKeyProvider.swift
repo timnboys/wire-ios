@@ -67,7 +67,7 @@ public class CoreCryptoKeyProvider {
     private func fetchCoreCryptoKey() throws -> Data {
         let item = CoreCryptoKeychainItem()
         let key: Data = try KeychainManager.fetchItem(item)
-        WireLogger.coreCrypto.info("Core crypto key exists: \(key.base64String()). Returning...")
+        WireLogger.coreCrypto.info("Core crypto key exists. Returning...")
         return key
     }
 
@@ -75,7 +75,7 @@ public class CoreCryptoKeyProvider {
         let item = CoreCryptoKeychainItem()
         WireLogger.coreCrypto.info("Core crypto key doesn't exist. Creating...")
         let key = try KeychainManager.generateKey(numberOfBytes: 32)
-        WireLogger.coreCrypto.info("Created core crypto key: \(key.base64String()). Storing...")
+        WireLogger.coreCrypto.info("Created core crypto key. Storing...")
         try KeychainManager.storeItem(item, value: key)
         WireLogger.coreCrypto.info("Stored core crypto key. Returning...")
         return key
@@ -153,5 +153,35 @@ struct LegacyCoreCryptoKeychainItem: KeychainItemProtocol {
             kSecValueData: value,
             kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked
         ]
+    }
+}
+
+extension CoreCryptoKeyProvider {
+
+    /// Static method to force update the core crypto key in the keychain.
+    /// - Returns: The newly generated core crypto key.
+    public static func updateCoreCryptoKey() throws -> Data {
+        let item = CoreCryptoKeychainItem()
+
+        // Generate new key
+        let newKey = try KeychainManager.generateKey(numberOfBytes: 32)
+        WireLogger.coreCrypto.info("Generated new core crypto key for update")
+
+        // Delete old key if it exists
+        do {
+            try KeychainManager.deleteItem(item)
+            WireLogger.coreCrypto.info("Deleted old core crypto key before update")
+        } catch let KeychainManager.Error.failedToDeleteItemFromKeychain(error) {
+            WireLogger.coreCrypto.error("Failed to delete old key during update: \(String(describing: error))")
+            //throw error
+        } catch {
+            WireLogger.coreCrypto.info("No existing key found — proceeding to store new key")
+        }
+
+        // Store new key
+        try KeychainManager.storeItem(item, value: newKey)
+        WireLogger.coreCrypto.info("Stored new core crypto key")
+
+        return newKey
     }
 }
