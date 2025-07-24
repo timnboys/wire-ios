@@ -16,9 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
+import GenericMessageProtocol
+import WireTransport
 import XCTest
 
-import WireTransport
 @testable import WireDataModelSupport
 @testable import WireRequestStrategySupport
 
@@ -965,4 +966,8 @@ extension MessageSendError: @retroactive Equatable {
             false
         }
     }
+}
+
+struct MockInitiateResetMLSConversationUseCase: WireRequestStrategy.InitiateResetMLSConversationUseCaseProtocol {
+    func invoke(groupID: WireDataModel.MLSGroupID, epoch: Int64) async {}
 }

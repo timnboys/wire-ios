@@ -17,8 +17,10 @@
 //
 
 import Foundation
+import GenericMessageProtocol
 import WireAnalytics
 import WireDataModel
+import WireFoundation
 import WireLogging
 
 extension ZMUserSession: AnalyticsEventTrackerProvider {
@@ -50,7 +52,7 @@ extension ZMUserSession: AnalyticsEventTrackerProvider {
 
             if let team = selfUser.team, let teamID = team.remoteIdentifier {
                 teamInfo = TeamInfo(
-                    id: teamID.uuidString,
+                    id: teamID.transportString(),
                     role: selfUser.teamRole.analyticsValue,
                     size: UInt(team.members.count)
                 )

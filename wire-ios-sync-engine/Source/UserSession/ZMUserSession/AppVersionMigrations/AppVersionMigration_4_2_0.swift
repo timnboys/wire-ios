@@ -18,13 +18,15 @@
 
 import Foundation
 import WireDomain
+import WireFoundation
 
 /// **Issue:**: To simplify the logic, we rely solely on journal value to perform InitialSync or not
 struct AppVersionMigration_4_2_0: AppVersionMigration {
 
     let appGroupIdentifier: String?
     let lastEventIDRepository: LastEventIDRepositoryInterface
-    var journal: JournalProtocol
+    let journal: JournalProtocol
+    let sessionManager: (any SessionManagerType)?
     let version: SemanticVersion = "4.2.0"
 
     func perform() async throws {

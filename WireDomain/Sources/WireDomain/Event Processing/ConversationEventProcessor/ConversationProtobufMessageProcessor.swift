@@ -16,10 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
+import GenericMessageProtocol
 import WireDataModel
 import WireLogging
 import WireNetwork
-import WireProtos
 
 public struct ConversationProtobufMessageProcessor: ConversationProtobufMessageProcessorProtocol {
 
@@ -288,6 +288,7 @@ public struct ConversationProtobufMessageProcessor: ConversationProtobufMessageP
             senderID: sender.id,
             senderDomain: sender.domain
         )
+
     }
 
 }
