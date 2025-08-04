@@ -176,6 +176,7 @@ extension ZMOTRMessage {
             return nil
 
         default:
+            // TODO: start here
             guard
                 conversation.shouldAdd(event: updateEvent),
                 let nonce = UUID(uuidString: message.messageID)
