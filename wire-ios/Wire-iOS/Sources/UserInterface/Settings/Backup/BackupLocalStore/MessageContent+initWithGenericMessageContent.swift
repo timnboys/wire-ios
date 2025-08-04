@@ -23,7 +23,7 @@ extension MessageBackupModel.Content {
 
     init?(_ content: GenericMessage.OneOf_Content) {
         switch content {
-        case let .text(text):
+        case let .text(text), let .temp(text):
             self.init(text)
         case let .asset(asset):
             self.init(asset)
