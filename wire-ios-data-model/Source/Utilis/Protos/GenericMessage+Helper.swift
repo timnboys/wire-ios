@@ -123,6 +123,8 @@ public extension GenericMessage {
             return data
         case let .inCallHandRaise(data):
             return data
+        case let .temp(data):
+            return data
         }
     }
 
