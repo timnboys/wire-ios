@@ -55,14 +55,15 @@ struct GenerateNotificationUseCase: GenerateNotificationUseCaseProtocol {
 
         for await events in updateEvents {
             logger.info(
-                "Processing \(events.count) pending events...",
+                "Processing \(events.count) pending events..., first event name: \(events.first?.name)",
                 attributes: .newNSE
             )
 
             for event in events {
-                if let notification = await generateNotification(for: event) {
+                if let notification = await generateNotification(for: event) { // here log about calls
+
                     logger.info(
-                        "Generated a notification from an event",
+                        "Generated a notification from an event: \(event.name)",
                         attributes: .newNSE
                     )
                     notifications.append(notification)
@@ -76,8 +77,15 @@ struct GenerateNotificationUseCase: GenerateNotificationUseCaseProtocol {
     private func generateNotification(
         for event: UpdateEvent
     ) async -> UserNotification? {
+        logger.info(
+            "Generate notification for \(event.name) ...",
+            attributes: .newNSE
+        )
         switch event {
         case let .conversation(conversationEvent):
+            logger.info(
+                "conversation event ..."
+            )
             do {
                 return try await conversationEventBuilder.buildContent(
                     event: conversationEvent

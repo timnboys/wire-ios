@@ -440,7 +440,7 @@ extension NotificationSession: PushNotificationStrategyDelegate {
         var tempNotifications = [Int: ZMLocalNotification]()
 
         for event in events {
-            if let callEventPayload = callEventPayloadForCallKit(from: event) {
+            if let callEventPayload = callEventPayloadForCallKit(from: event) { //!!!
                 WireLogger.calling.info("detected a call event", attributes: event.logAttributes, .legacyNSE)
                 // Only store the last call event.
                 callEvent = callEventPayload
@@ -463,6 +463,7 @@ extension NotificationSession: PushNotificationStrategyDelegate {
     private func callEventPayloadForCallKit(from event: ZMUpdateEvent) -> CallEventPayload? {
         // Ensure this actually is a call event.
         guard let callContent = CallEventContent(from: event) else {
+            WireLogger.calling.info("My log: this is not a call event")
             return nil
         }
 

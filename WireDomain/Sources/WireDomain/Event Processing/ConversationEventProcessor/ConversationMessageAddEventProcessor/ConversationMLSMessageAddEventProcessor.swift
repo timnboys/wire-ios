@@ -101,6 +101,7 @@ struct ConversationMLSMessageAddEventProcessor: ConversationMLSMessageAddEventPr
             )
         }
 
+        // 22
         // Handle calling if there's one.
         if let callEventInfo = getCallEventInfo(
             event: event,
@@ -157,7 +158,7 @@ struct ConversationMLSMessageAddEventProcessor: ConversationMLSMessageAddEventPr
         ) else {
             return nil
         }
-
+// 22
         let isRemoteMute = callContent.type == "REMOTEMUTE"
         let callingConversationID = genericMessage.calling.qualifiedConversationID
         let senderID = event.senderID

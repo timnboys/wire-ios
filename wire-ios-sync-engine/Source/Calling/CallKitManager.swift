@@ -487,6 +487,8 @@ public class CallKitManager: NSObject, CallKitManagerInterface {
         let call = callRegister.registerNewCall(with: handle)
 
         log("provider.reportNewIncomingCall")
+        WireLogger.notifications.info("provider.reportNewIncomingCall")
+        print("AAA provider.reportNewIncomingCall")
 
         provider.reportNewIncomingCall(
             with: call.id,
@@ -517,6 +519,8 @@ public class CallKitManager: NSObject, CallKitManagerInterface {
         reason: CXCallEndedReason
     ) {
         logger.info("report call ended")
+        WireLogger.notifications.info("report call ended")
+        print("AAA report call ended")
 
         guard isEnabled else {
             logger.warn("fail: report incoming call: CallKit not enabled")

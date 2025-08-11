@@ -20,6 +20,7 @@ import GenericMessageProtocol
 import WireDataModel
 import WireFoundation
 import WireNetwork
+import WireLogging
 
 struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEventNotificationBuilderProtocol {
 
@@ -53,6 +54,7 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
 
         switch event {
         case let .left(mlsMessageEvent):
+            WireLogger.notifications.info("try to build LEFT mlsMessageAdd mlsMessageEvent: \(mlsMessageEvent)")
             let decryptedMessage = mlsMessageEvent.decryptedMessages.first?.message
 
             message = try decryptMessage(
@@ -63,8 +65,11 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
             senderID = mlsMessageEvent.senderID
             conversationID = mlsMessageEvent.conversationID
             timestamp = mlsMessageEvent.timestamp
+            WireLogger.notifications.info("senderID: \(senderID)")
+            WireLogger.notifications.info("conversationID: \(conversationID)")
 
         case let .right(proteusMessageEvent):
+            WireLogger.notifications.info("try to build RIGHT mlsMessageAdd")
             let decryptedMessage = proteusMessageEvent.message.decryptedMessage
             let external = proteusMessageEvent.externalData?.encryptedMessage
 
@@ -76,16 +81,20 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
             senderID = proteusMessageEvent.senderID
             conversationID = proteusMessageEvent.conversationID
             timestamp = proteusMessageEvent.timestamp
+            WireLogger.notifications.info("senderID: \(senderID)")
         }
 
+        WireLogger.notifications.info("will build conversationCallingEventNotificationBuilder,, calling: \(message.calling),, conversationID: \(conversationID)")
         if let callingNotification = await conversationCallingEventNotificationBuilder.buildContent(
             calling: message.calling,
             at: timestamp,
             conversationID: conversationID,
             senderID: senderID
         ) {
+            WireLogger.notifications.info("!!! detects callingNotification !!!!")
             return callingNotification
         } else {
+            WireLogger.notifications.info("!!! buildMessageContentNotification !!!")
             return await buildMessageContentNotification(
                 message: message,
                 senderID: senderID,
@@ -105,11 +114,11 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
             conversationID: conversationID
         )
 
-        guard canDisplayNotification else {
-            return nil
-        }
+//        guard canDisplayNotification else {
+//            return nil
+//        }
 
-        let hidesNotificationContent = await context.shouldHideNotification()
+        let hidesNotificationContent = false//await context.shouldHideNotification()
 
         guard !hidesNotificationContent else {
             return await conversationHiddenMessageNotificationBuilder.buildContent(

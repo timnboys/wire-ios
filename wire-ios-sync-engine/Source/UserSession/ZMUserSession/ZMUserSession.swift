@@ -1622,7 +1622,7 @@ extension ZMUserSession {
             clientUpdateStatus.needsToVerifySelfClient = false
         }
     }
-
+// 22
     private func onProcessedCallEvent(callEventInfo: CallEventInfo) {
         let serverTimeDelta = syncContext.performAndWait {
             syncContext.serverTimeDelta // serverTimeDelta can only be accessed on the sync context

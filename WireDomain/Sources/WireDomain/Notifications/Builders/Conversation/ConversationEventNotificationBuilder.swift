@@ -19,6 +19,7 @@
 import UserNotifications
 import WireDataModel
 import WireNetwork
+import WireLogging
 
 // sourcery: AutoMockable
 protocol ConversationEventNotificationBuilderProtocol {
@@ -46,13 +47,14 @@ struct ConversationEventNotificationBuilder: ConversationEventNotificationBuilde
             time: event.timestamp
         )
 
-        guard canDisplayNotification else {
-            return nil
-        }
+//        guard canDisplayNotification else {
+//            WireLogger.notifications.info("!!! canDisplayNotification !!!")
+//            return nil
+//        }
 
         switch event {
         case let .mlsMessageAdd(mlsMessageEvent):
-
+            WireLogger.notifications.info("build mlsMessageAdd notification mlsMessageEvent: \(mlsMessageEvent)")
             return try await conversationMessageAddEventNotificationBuilder.buildContent(
                 event: .left(mlsMessageEvent)
             )
@@ -94,6 +96,7 @@ struct ConversationEventNotificationBuilder: ConversationEventNotificationBuilde
             )
 
         default:
+            WireLogger.notifications.info("can't build content")
             return nil
         }
     }

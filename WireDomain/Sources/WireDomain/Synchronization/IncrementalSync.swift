@@ -123,7 +123,7 @@ public struct IncrementalSync: IncrementalSyncProtocol {
                 logger.debug("handling live event stream", attributes: .syncAttributes(initialSync: false))
                 syncStateSubject.send(.liveSyncing(.ongoing))
 
-                await processLiveEvents(
+                await processLiveEvents( // 22
                     liveEventStream: liveEventStream,
                     processedEnvelopeIDs: processedEnvelopeIDs
                 )
@@ -138,7 +138,7 @@ public struct IncrementalSync: IncrementalSyncProtocol {
         }
     }
 
-    private func processLiveEvents(
+    private func processLiveEvents(// 22
         liveEventStream: AsyncThrowingStream<UpdateEventEnvelope, any Error>,
         processedEnvelopeIDs: Set<UUID>
     ) async {
@@ -320,6 +320,7 @@ public struct IncrementalSync: IncrementalSyncProtocol {
 
         public func suspend() async {
             task.cancel()
+            print("AAA should closePushChannel")
             await closePushChannel()
         }
     }

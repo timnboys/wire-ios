@@ -48,11 +48,11 @@ final class GenerateNotificationStep: Component<GenerateNotificationDependency>,
             eventID: dependency.eventID
         )
 
-        let userNotifications = try await generateNotificationUseCase.invoke(
+        let userNotifications = try await generateNotificationUseCase.invoke( // Processing 1 pending events...
             updateEvents: eventsStream
         )
 
-        try await showNotificationStep.showNotifications(
+        try await showNotificationStep.showNotifications(// show Showing notification to the user:
             userNotifications
         )
     }

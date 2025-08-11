@@ -101,7 +101,7 @@ struct ShowNotificationUseCase: ShowNotificationUseCaseProtocol {
         notification.badge = try await getNotificationBadge()
 
         WireLogger.notifications.info(
-            "Showing notification to the user",
+            "Showing notification to the user: \(notification.title), count: \(notifications.count)",
             attributes: .newNSE
         )
 

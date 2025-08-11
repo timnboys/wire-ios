@@ -144,6 +144,7 @@ final class SyncAgent: NSObject, SyncAgentProtocol {
             "suspending sync \(backgroundActivity != nil ? "in a background task" : "")",
             attributes: .syncAttributes
         )
+        print("AAA suspending sync \(backgroundActivity != nil ? "in a background task" : "")")
 
         ongoingSyncTask?.cancel()
         await incrementalSyncToken?.suspend()
@@ -151,6 +152,7 @@ final class SyncAgent: NSObject, SyncAgentProtocol {
         syncStateSubject.send(.suspended)
 
         if let backgroundActivity {
+            print("AAA backgroundActivity")
             BackgroundActivityFactory.shared.endBackgroundActivity(
                 backgroundActivity
             )

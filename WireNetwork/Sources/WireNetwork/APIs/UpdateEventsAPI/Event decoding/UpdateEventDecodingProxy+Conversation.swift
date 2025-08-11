@@ -17,6 +17,56 @@
 //
 
 import Foundation
+import WireLogging
+
+enum JSONValue: Decodable {
+    case object([String: JSONValue])
+    case array([JSONValue])
+    case string(String)
+    case number(Double)
+    case bool(Bool)
+    case null
+
+    init(from decoder: Decoder) throws {
+        if let c = try? decoder.container(keyedBy: DynamicCodingKeys.self) {
+            var dict: [String: JSONValue] = [:]
+            for key in c.allKeys {
+                dict[key.stringValue] = try c.decode(JSONValue.self, forKey: key)
+            }
+            self = .object(dict)
+            return
+        }
+        if var uc = try? decoder.unkeyedContainer() {
+            var arr: [JSONValue] = []
+            while !uc.isAtEnd { arr.append(try uc.decode(JSONValue.self)) }
+            self = .array(arr)
+            return
+        }
+        let s = try? decoder.singleValueContainer()
+        if let v = try? s?.decode(Bool.self) { self = .bool(v); return }
+        if let v = try? s?.decode(Double.self) { self = .number(v); return }
+        if let v = try? s?.decode(String.self) { self = .string(v); return }
+        self = .null
+    }
+
+    func toAny() -> Any {
+        switch self {
+        case .object(let o): return o.mapValues { $0.toAny() }
+        case .array(let a):  return a.map { $0.toAny() }
+        case .string(let s): return s
+        case .number(let n): return n
+        case .bool(let b):   return b
+        case .null:          return NSNull()
+        }
+    }
+
+    private struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) { self.stringValue = stringValue }
+        var intValue: Int? { nil }
+        init?(intValue: Int) { nil }
+    }
+}
 
 extension UpdateEventDecodingProxy {
 
@@ -25,6 +75,14 @@ extension UpdateEventDecodingProxy {
         from decoder: any Decoder
     ) throws {
         let container = try decoder.container(keyedBy: ConversationEventCodingKeys.self)
+
+        let json = try JSONValue(from: decoder).toAny()
+        if JSONSerialization.isValidJSONObject(json)  {
+            let data = try JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted])
+            if let pretty = String(data: data, encoding: .utf8) {
+                WireLogger.notifications.info("Pretty JSON:\n\(pretty)")
+            }
+        }
 
         switch eventType {
         case .accessUpdate:

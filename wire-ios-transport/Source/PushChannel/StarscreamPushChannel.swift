@@ -114,7 +114,7 @@ final class StarscreamPushChannel: NSObject, PushChannelType {
             scheduleOpen()
         }
     }
-
+//
     func close() {
         WireLogger.pushChannel.info("Push channel was closed", attributes: .pushChannelV0)
 

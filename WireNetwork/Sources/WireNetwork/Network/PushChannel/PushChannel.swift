@@ -85,6 +85,7 @@ public actor PushChannel: PushChannelProtocol {
     }
 
     public func close() async {
+        print("AAA closing push channel")
         WireLogger.pushChannel.debug("closing push channel")
         await webSocket.close()
         tearDownKeepAliveTask()

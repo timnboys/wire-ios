@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WireLogging
 
 class CallKitCallRegister {
 
@@ -38,6 +39,7 @@ class CallKitCallRegister {
 
     private func persistStorage() {
         VoIPPushHelper.knownCallHandles = storage.values.map(\.handle.encodedString)
+        WireLogger.notifications.info("knownCallHandles count: \(VoIPPushHelper.knownCallHandles.count)")
     }
 
     // MARK: - Registration
@@ -46,6 +48,8 @@ class CallKitCallRegister {
         defer { persistStorage() }
         let call = CallKitCall(id: UUID(), handle: handle)
         storage[call.id] = call
+        WireLogger.notifications.info("registerNewCall call: \(call)")
+        print(call.handle.encodedString)
         return call
     }
 

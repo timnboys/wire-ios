@@ -56,6 +56,7 @@ public extension ZMUserSession {
 
     @objc
     func applicationDidEnterBackground(_ note: Notification?) {
+        print("AAA applicationDidEnterBackground")
         syncAgent?.suspend()
         stopEphemeralTimers()
         lockDatabase()

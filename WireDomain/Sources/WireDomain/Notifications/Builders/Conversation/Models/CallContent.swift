@@ -77,6 +77,18 @@ extension CallContent {
             )
             return try decoder.decode(Self.self, from: data)
         } catch {
+            let moreInfo: String?
+            if let dataString = String(data: data, encoding: .utf8) {
+                moreInfo = dataString
+            } else {
+                moreInfo = nil
+            }
+            WireLogger.notifications.debug(
+                "My new call logs content: \(moreInfo ?? "NOTHING")"
+            )
+            WireLogger.notifications.debug(
+                "My new Calling content: \(calling.content)"
+            )
             WireLogger.notifications.debug(
                 "No call to handle",
                 attributes: .newNSE

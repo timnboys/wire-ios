@@ -19,6 +19,7 @@
 import GenericMessageProtocol
 import WireDataModel
 import WireNetwork
+import WireLogging
 
 /// Handles a calling notification (using CallKit in priority if available) related to an incoming / missed call
 struct ConversationCallingEventNotificationBuilder: ConversationCallingEventNotificationBuilderProtocol {
@@ -34,9 +35,11 @@ struct ConversationCallingEventNotificationBuilder: ConversationCallingEventNoti
         senderID: UserID
     ) async -> UserNotification? {
         guard let callContent: CallContent = .decode(from: calling) else {
+            WireLogger.notifications.info("can't decode CallContent")
             return nil
         }
-
+    
+        WireLogger.notifications.info("callContent \(callContent)")
         let displayCallKitNotification = await validator.validateCallKitNotification(
             conversationID: conversationID,
             senderID: senderID,
@@ -54,15 +57,16 @@ struct ConversationCallingEventNotificationBuilder: ConversationCallingEventNoti
 
         if displayCallKitNotification {
             // First, let's try to return a CallKit notification if possible.
+            WireLogger.notifications.info("displayCallKitNotification")
             return await buildCallKitNotification(
                 callContent: callContent,
                 accountID: accountID,
                 conversationID: conversationID,
                 senderID: senderID
             )
-
         } else if displayCallNotification {
             // If not, try to return a regular call notification.
+            WireLogger.notifications.info("displayCallNotification")
             return await buildCallNotification(
                 callContent: callContent,
                 senderID: senderID,
@@ -70,6 +74,7 @@ struct ConversationCallingEventNotificationBuilder: ConversationCallingEventNoti
             )
         } else {
             // Else, this is not a call, return nil.
+            WireLogger.notifications.info("Else, this is not a call, return nil.")
             return nil
         }
 
@@ -377,6 +382,7 @@ extension ConversationCallingEventNotificationBuilder {
             eventTimestamp: Date?,
             callContent: CallContent
         ) async -> Bool {
+            WireLogger.notifications.info("will validateCallKitNotification")
             let conversation = await conversationLocalStore.fetchOrCreateConversation(
                 id: conversationID.id,
                 domain: conversationID.domain
@@ -394,7 +400,9 @@ extension ConversationCallingEventNotificationBuilder {
             let isUserSessionLoaded = loaderUserSessionsIDs.contains(accountID)
 
             let handle = "\(accountID.transportString())+\(conversationID.id.transportString())"
+            WireLogger.notifications.info("handle: \(handle)")
             let knownCallHandles = userDefaults.object(forKey: Constants.knownCalls) as? [String] ?? []
+            WireLogger.notifications.info("NSE knownCallHandles count: \(knownCallHandles.count)")
             let wasCallHandleReported = knownCallHandles.contains(handle)
 
             let initiatesRinging = callContent.isIncomingCall && !wasCallHandleReported
@@ -402,14 +410,22 @@ extension ConversationCallingEventNotificationBuilder {
                 callContent.isEndCall || callContent.isAnsweredElsewhere || callContent
                     .isRejected
             ) && wasCallHandleReported
-
+            WireLogger.notifications.info("terminatesRinging: \(terminatesRinging)")
+            WireLogger.notifications.info("isAnsweredElsewhere: \(callContent.isAnsweredElsewhere)")
             let isValidState = initiatesRinging || terminatesRinging
 
             let serverTimeDelta = await conversationLocalStore.fetchServerTimeDelta()
             let currentTimestamp = Date.now.addingTimeInterval(serverTimeDelta)
             let isCallTimeOut = eventTimestamp != nil ? Int(currentTimestamp.timeIntervalSince(eventTimestamp!)) > 30 :
                 true
-
+            WireLogger.notifications.info("needsToBeUpdatedFromBackend: \(needsToBeUpdatedFromBackend)")
+            WireLogger.notifications.info("isConversationMuted: \(isConversationMuted)")
+            WireLogger.notifications.info("isConversationForcedReadOnly: \(isConversationForcedReadOnly)")
+            WireLogger.notifications.info("isAVSReady: \(isAVSReady)")
+            WireLogger.notifications.info("isCallKitReady: \(isCallKitReady)")
+            WireLogger.notifications.info("isUserSessionLoaded: \(isUserSessionLoaded)")
+            WireLogger.notifications.info("isCallTimeOut: \(isCallTimeOut)")
+            WireLogger.notifications.info("isValidState: \(isValidState)")
             return !needsToBeUpdatedFromBackend
                 && !isConversationMuted
                 && !isConversationForcedReadOnly
