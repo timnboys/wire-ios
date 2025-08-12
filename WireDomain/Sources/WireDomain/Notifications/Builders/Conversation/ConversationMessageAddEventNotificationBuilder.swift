@@ -63,8 +63,9 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
             )
 
             senderID = mlsMessageEvent.senderID
-            conversationID = mlsMessageEvent.conversationID
+            conversationID = getConversationID(for: message, eventConversationID: mlsMessageEvent.conversationID)
             timestamp = mlsMessageEvent.timestamp
+
             WireLogger.notifications.info("senderID: \(senderID)")
             WireLogger.notifications.info("conversationID: \(conversationID)")
 
@@ -85,6 +86,7 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
         }
 
         WireLogger.notifications.info("will build conversationCallingEventNotificationBuilder,, calling: \(message.calling),, conversationID: \(conversationID)")
+
         if let callingNotification = await conversationCallingEventNotificationBuilder.buildContent(
             calling: message.calling,
             at: timestamp,
@@ -100,6 +102,21 @@ struct ConversationMessageAddEventNotificationBuilder: ConversationMessageAddEve
                 senderID: senderID,
                 conversationID: conversationID
             )
+        }
+    }
+
+    private func getConversationID(for message: GenericMessage, eventConversationID: ConversationID) -> ConversationID {
+        if message.hasCalling  {
+            let callingConversationID = message.calling.qualifiedConversationID
+            guard !callingConversationID.id.isEmpty,
+                  let conversationUUID = UUID(uuidString: callingConversationID.id)
+            else {
+                return eventConversationID
+            }
+            return QualifiedID(id: conversationUUID, domain: callingConversationID.domain)
+
+        } else {
+            return eventConversationID
         }
     }
 

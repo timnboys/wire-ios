@@ -54,7 +54,8 @@ struct ConversationEventNotificationBuilder: ConversationEventNotificationBuilde
 
         switch event {
         case let .mlsMessageAdd(mlsMessageEvent):
-            WireLogger.notifications.info("build mlsMessageAdd notification mlsMessageEvent: \(mlsMessageEvent)")
+            WireLogger.notifications.info("build mlsMessageAdd notification mlsMessageEvent");
+                                          //: \(mlsMessageEvent)")
             return try await conversationMessageAddEventNotificationBuilder.buildContent(
                 event: .left(mlsMessageEvent)
             )
