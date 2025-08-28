@@ -23,6 +23,7 @@ public struct NewUserInfo: Equatable, Sendable {
     let name: String
     let handle: String?
     let teamID: UUID?
+    let usesSSO: Bool
     let accentID: Int
     let previewAssetKey: String?
     let completeAssetKey: String?

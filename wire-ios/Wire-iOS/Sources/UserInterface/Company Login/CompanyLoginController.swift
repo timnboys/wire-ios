@@ -119,6 +119,7 @@ final class CompanyLoginController: NSObject, CompanyLoginRequesterDelegate {
 
         setupObservers()
         flowHandler.enableInAppBrowser = true
+        flowHandler.enableAuthenticationSession = DeveloperFlag.useWireAuthentication.isOn
         flowHandler.delegate = self
     }
 

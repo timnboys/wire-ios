@@ -28,7 +28,7 @@ protocol CompanyLoginFlowHandlerDelegate: AnyObject {
 
 /// Handles opening URLs to validate company login authentication.
 
-final class CompanyLoginFlowHandler {
+final class CompanyLoginFlowHandler: NSObject {
 
     /// The delegate of the flow handler.
     weak var delegate: CompanyLoginFlowHandlerDelegate?
@@ -97,6 +97,9 @@ final class CompanyLoginFlowHandler {
         }
 
         currentAuthenticationSession = session
+        // Prevents cookie persistence.
+        session.prefersEphemeralWebBrowserSession = true
+        session.presentationContextProvider = self
         session.start()
     }
 
@@ -118,6 +121,15 @@ final class CompanyLoginFlowHandler {
 
         activeWebBrowser = safariViewController
         UIApplication.shared.topmostViewController()?.present(safariViewController, animated: true, completion: nil)
+    }
+
+}
+
+
+extension CompanyLoginFlowHandler: ASWebAuthenticationPresentationContextProviding {
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        ASPresentationAnchor()
     }
 
 }

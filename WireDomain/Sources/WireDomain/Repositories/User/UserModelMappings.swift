@@ -129,12 +129,12 @@ extension WireNetwork.UserUpdateEvent {
 extension WireNetwork.User {
 
     func toDomainModel() -> NewUserInfo {
-
         .init(
             userID: id.toDomainModel(),
             name: name,
             handle: handle,
             teamID: teamID,
+            usesSSO: false, // only relevant for selfUser
             accentID: accentID,
             previewAssetKey: assets
                 .first(where: { $0.size == .preview })
@@ -149,7 +149,6 @@ extension WireNetwork.User {
             serviceProvider: service?.provider,
             supportedProtocols: supportedProtocols?.toDomainModel()
         )
-
     }
 
 }
@@ -162,6 +161,7 @@ extension WireNetwork.SelfUser {
             name: name,
             handle: handle,
             teamID: teamID,
+            usesSSO: ssoID?.subject?.isEmpty == false,
             accentID: accentID,
             previewAssetKey: assets?
                 .first(where: { $0.size == .preview })

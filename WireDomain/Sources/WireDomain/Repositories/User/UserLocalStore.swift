@@ -337,6 +337,7 @@ public final class UserLocalStore: UserLocalStoreProtocol {
             persistedUser.serviceIdentifier = userInfo.serviceID?.transportString()
             persistedUser.providerIdentifier = userInfo.serviceProvider?.transportString()
             persistedUser.supportedProtocols = userInfo.supportedProtocols ?? [.proteus]
+            persistedUser.usesCompanyLogin = userInfo.usesSSO
             persistedUser.needsToBeUpdatedFromBackend = false
         }
     }
