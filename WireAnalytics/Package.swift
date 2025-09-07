@@ -4,8 +4,8 @@ import Foundation
 import PackageDescription
 
 // You can enable/disable Datadog for debugging by overriding the boolean.
-let isDatadogEnabled = hasEnvironmentVariable("ENABLE_DATADOG", "true")
-let isCountlyEnabled = hasEnvironmentVariable("ENABLE_COUNTLY", "true")
+let isDatadogEnabled = hasEnvironmentVariable("ENABLE_DATADOG", "false")
+let isCountlyEnabled = hasEnvironmentVariable("ENABLE_COUNTLY", "false")
 
 let package = Package(
     name: "WireAnalytics",
